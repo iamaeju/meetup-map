@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">까치 로컬 커뮤니티</string>
+    <string name="title_activity_main">까치 로컬 커뮤니티</string>
+    <string name="package_name">com.kkachi.app</string>
+    <string name="custom_url_scheme">com.kkachi.app</string>
+</resources>
