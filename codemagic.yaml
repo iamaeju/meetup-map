@@ -7,6 +7,8 @@ workflows:
       node: 20
       vars:
         PACKAGE_NAME: "com.kkachi.app"
+      groups:
+        - app_config
     scripts:
       - name: Install dependencies
         script: npm ci
@@ -42,6 +44,8 @@ workflows:
       cocoapods: default
       vars:
         PACKAGE_NAME: "com.kkachi.app"
+      groups:
+        - app_config
     scripts:
       - name: Install dependencies
         script: npm ci
