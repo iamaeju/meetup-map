@@ -1,5 +1,9 @@
 {
   "appId": "com.kkachi.app",
   "appName": "까치 로컬 커뮤니티",
-  "webDir": "dist"
+  "webDir": "dist",
+  "server": {
+    "url": "https://meetup-map-pearl.vercel.app",
+    "cleartext": false
+  }
 }
