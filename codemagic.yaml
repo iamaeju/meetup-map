@@ -41,7 +41,6 @@ workflows:
     environment:
       node: 22
       xcode: latest
-      cocoapods: default
       vars:
         PACKAGE_NAME: "com.kkachi.app"
       groups:
@@ -63,9 +62,13 @@ workflows:
           npm run build
       - name: Sync Capacitor iOS
         script: npx cap sync ios
-      - name: Install CocoaPods
+      - name: Build iOS app (simulator, no signing needed)
         script: |
-          cd ios/App
-          pod install
+          xcodebuild build \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO
     artifacts:
-      - ios/App/build/**/*.ipa
+      - build/ios/**/*.app
