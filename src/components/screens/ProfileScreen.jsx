@@ -150,7 +150,7 @@ export default function ProfileScreen({
             <span className="muted">›</span>
           </button>
           <button className="settings-row" onClick={() => setPanel('host')}>
-            <span>🏪 {currentUser.host?.registered ? '호스트 정보 관리' : '스몰비즈니스 호스트 등록'}</span>
+            <span>🏪 {currentUser.host?.registered ? '호스트 정보 관리' : '팝미팅 호스트 등록'}</span>
             <span className="muted">›</span>
           </button>
           <div className="settings-row">

@@ -36,7 +36,7 @@ export default function HostRegisterScreen({ host, currentUserName, onSave, onCa
         <button className="detail-close" onClick={onBack}>
           ‹
         </button>
-        <strong>호스트 등록</strong>
+        <strong>팝미팅 호스트 등록</strong>
       </div>
 
       <div className="settings-detail-body">
