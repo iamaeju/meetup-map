@@ -61,3 +61,46 @@ export function joinWaitlist(id, name) {
 export function leaveWaitlist(id, name) {
   return updateDoc(doc(db, COLLECTION, id), { waitlist: arrayRemove(name) });
 }
+
+// ---------- 더치페이 ----------
+
+export function setDutchpay(id, { total, note, updatedBy }) {
+  return updateDoc(doc(db, COLLECTION, id), {
+    dutchpay: { total, note: note || '', updatedBy, updatedAt: Date.now() },
+  });
+}
+
+export function clearDutchpay(id) {
+  return updateDoc(doc(db, COLLECTION, id), { dutchpay: null });
+}
+
+// ---------- 투표 ----------
+
+export function createPoll(id, { question, options, createdBy }) {
+  return updateDoc(doc(db, COLLECTION, id), {
+    poll: {
+      question,
+      options: options.map((text) => ({ text, votes: [] })),
+      createdBy,
+      createdAt: Date.now(),
+      open: true,
+    },
+  });
+}
+
+export function votePoll(id, meetup, optionIndex, voterName) {
+  const options = meetup.poll.options.map((opt, i) => {
+    const votes = opt.votes.filter((v) => v !== voterName);
+    if (i === optionIndex) votes.push(voterName);
+    return { ...opt, votes };
+  });
+  return updateDoc(doc(db, COLLECTION, id), { 'poll.options': options });
+}
+
+export function closePoll(id) {
+  return updateDoc(doc(db, COLLECTION, id), { 'poll.open': false });
+}
+
+export function clearPoll(id) {
+  return updateDoc(doc(db, COLLECTION, id), { poll: null });
+}

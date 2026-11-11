@@ -1771,6 +1771,166 @@ button {
   color: var(--accent-dark);
 }
 
+/* ---------- 까치 호스트 뱃지 ---------- */
+
+.kkachi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 8px;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  vertical-align: middle;
+}
+
+.host-status-banner.pending {
+  background: #fff8ec;
+  color: #8a5a00;
+}
+.host-status-banner.rejected {
+  background: #fff0ee;
+  color: #b3261e;
+}
+
+/* ---------- 관리자 호스트 승인 ---------- */
+
+.admin-app-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin: 0 18px 12px;
+}
+.admin-app-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.admin-app-intro {
+  font-size: 13.5px;
+  color: var(--text-soft);
+  line-height: 1.5;
+  margin: 6px 0;
+}
+.admin-app-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* ---------- 모임 채팅 상단 기능바 ---------- */
+
+.chat-toolbar {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--card-bg);
+}
+.chat-tool-btn {
+  flex: 1;
+  border: none;
+  background: none;
+  padding: 11px 4px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-soft);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.chat-tool-btn.active {
+  color: var(--accent-dark);
+  border-bottom-color: var(--accent-dark);
+}
+
+.chat-tool-panel {
+  padding: 14px 18px;
+  background: #f8f9f2;
+  border-bottom: 1px solid var(--border);
+}
+.chat-tool-panel h4 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.chat-tool-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.dutchpay-total {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0 0 4px;
+}
+.dutchpay-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dutchpay-form input {
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: 13.5px;
+}
+
+.poll-question {
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+.poll-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.poll-form input {
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: 13.5px;
+}
+.poll-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  padding: 9px 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden;
+}
+.poll-option.voted {
+  border-color: var(--accent-dark);
+}
+.poll-option-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--accent-soft);
+  z-index: 0;
+  transition: width 0.2s ease;
+}
+.poll-option-label,
+.poll-option-count {
+  position: relative;
+  z-index: 1;
+}
+.poll-option-count {
+  color: var(--muted);
+  font-weight: 500;
+}
+
 /* ---------- small screens ---------- */
 
 @media (max-width: 480px) {

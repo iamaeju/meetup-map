@@ -3,6 +3,12 @@ import { CATEGORIES, PROVINCES } from '../../data/meetups';
 
 const REAL_CATEGORIES = CATEGORIES.filter((c) => c.id !== 'all');
 
+const STATUS_BANNER = {
+  pending: { className: 'host-status-banner pending', text: '⏳ 승인 검토 중이에요. 관리자가 확인 후 알려드려요.' },
+  approved: { className: 'host-status-banner', text: '✅ 승인된 팝미팅 호스트예요. 프로필에 뱃지가 표시돼요.' },
+  rejected: { className: 'host-status-banner rejected', text: '❌ 이번 신청은 반려됐어요. 내용을 수정해서 다시 신청해보세요.' },
+};
+
 export default function HostRegisterScreen({ host, currentUserName, onSave, onCancelHost, onBack }) {
   const [displayName, setDisplayName] = useState(host?.displayName || currentUserName);
   const [intro, setIntro] = useState(host?.intro || '');
@@ -11,7 +17,15 @@ export default function HostRegisterScreen({ host, currentUserName, onSave, onCa
   const [isBusiness, setIsBusiness] = useState(host?.isBusiness || false);
   const [error, setError] = useState('');
 
-  const isRegistered = !!host?.registered;
+  const status = host?.status || 'none';
+  const isApplied = status === 'pending' || status === 'approved';
+
+  const submitLabel = {
+    none: '호스트 등록 신청하기',
+    pending: '신청 내용 수정하기',
+    approved: '호스트 정보 수정하기',
+    rejected: '다시 신청하기',
+  }[status];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -20,12 +34,14 @@ export default function HostRegisterScreen({ host, currentUserName, onSave, onCa
       return;
     }
     onSave({
-      registered: true,
+      // 이미 승인된 호스트가 정보만 수정하는 경우는 승인 상태 유지, 그 외(신규/반려 후 재신청)는 다시 검토 대기로
+      status: status === 'approved' ? 'approved' : 'pending',
       displayName: displayName.trim(),
       intro: intro.trim(),
       category,
       region,
       isBusiness,
+      appliedAt: new Date().toISOString(),
     });
     onBack();
   };
@@ -40,10 +56,8 @@ export default function HostRegisterScreen({ host, currentUserName, onSave, onCa
       </div>
 
       <div className="settings-detail-body">
-        {isRegistered && (
-          <div className="host-status-banner">
-            ✅ 호스트로 등록되어 있어요. 아래 내용을 수정할 수 있어요.
-          </div>
+        {STATUS_BANNER[status] && (
+          <div className={STATUS_BANNER[status].className}>{STATUS_BANNER[status].text}</div>
         )}
 
         <form className="host-form" onSubmit={handleSubmit}>
@@ -93,10 +107,10 @@ export default function HostRegisterScreen({ host, currentUserName, onSave, onCa
           {error && <p className="form-error">{error}</p>}
 
           <button type="submit" className="btn btn-primary btn-block">
-            {isRegistered ? '수정 완료' : '호스트 등록하기'}
+            {submitLabel}
           </button>
 
-          {isRegistered && (
+          {isApplied && (
             <button
               type="button"
               className="btn btn-danger btn-block"

@@ -7,10 +7,16 @@ import {
   onAuthStateChanged,
   updateProfile,
 } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from './firebase';
 
 const KAKAO_UID_KEY = 'kkachi_kakao_uid';
+
+// 호스트 승인을 처리할 수 있는 관리자 계정
+export const ADMIN_EMAILS = ['iamaeju@daain.com'];
+export function isAdmin(user) {
+  return !!user?.email && ADMIN_EMAILS.includes(user.email);
+}
 
 export const DEFAULT_NOTIFICATION_SETTINGS = {
   all: true,
@@ -23,13 +29,15 @@ export const DEFAULT_NOTIFICATION_SETTINGS = {
   soundType: 'default',
 };
 
+// status: 'none' | 'pending' | 'approved' | 'rejected'
 export const DEFAULT_HOST = {
-  registered: false,
+  status: 'none',
   displayName: '',
   intro: '',
   category: '',
   region: '',
   isBusiness: false,
+  appliedAt: null,
 };
 
 function withDefaults(user) {
@@ -167,6 +175,17 @@ export async function updateUser(id, updater) {
   const next = updater(current);
   await setDoc(doc(db, 'users', id), next, { merge: true });
   return next;
+}
+
+// 관리자용 — 승인 대기 중인 호스트 신청 목록
+export async function listPendingHostApplications() {
+  const q = query(collection(db, 'users'), where('host.status', '==', 'pending'));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+export async function setHostStatus(userId, status) {
+  return updateUser(userId, (u) => ({ ...u, host: { ...u.host, status } }));
 }
 
 export async function toggleFollow(currentUserId, targetName) {
