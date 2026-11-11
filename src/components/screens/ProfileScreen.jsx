@@ -79,7 +79,7 @@ export default function ProfileScreen({
 
       <div className="profile-head">
         <button className="profile-avatar" onClick={handlePickImage}>
-          {profileImage ? <img src={profileImage} alt="프로필" /> : '🙂'}
+          <img src={profileImage || '/default-avatar.jpg'} alt="프로필" />
           <span className="profile-avatar-edit">＋</span>
         </button>
         <input
