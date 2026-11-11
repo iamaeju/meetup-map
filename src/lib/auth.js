@@ -7,7 +7,7 @@ import {
   onAuthStateChanged,
   updateProfile,
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from './firebase';
 
 const KAKAO_UID_KEY = 'kkachi_kakao_uid';
@@ -167,6 +167,14 @@ export function watchSession(callback) {
       }
     }
     callback(null);
+  });
+}
+
+// 내 프로필 문서를 실시간 구독 — 다른 세션(관리자)이 호스트 승인 등으로 내 문서를 바꾸면 즉시 반영됨
+export function subscribeToUserDoc(id, callback) {
+  if (!isFirebaseConfigured || !id) return () => {};
+  return onSnapshot(doc(db, 'users', id), (snap) => {
+    if (snap.exists()) callback(withDefaults({ id, ...snap.data() }));
   });
 }
 

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { buildChatThreads } from './data/meetups';
 import { matchesCapacity } from './components/screens/ListScreen';
 import { useKakaoLoader } from './hooks/useKakaoLoader';
-import { watchSession, logOut, socialLoginKakao, toggleFollow, updateUser } from './lib/auth';
+import { watchSession, subscribeToUserDoc, logOut, socialLoginKakao, toggleFollow, updateUser } from './lib/auth';
 import { consumeKakaoRedirect } from './lib/kakaoAuth';
 import { isFirebaseConfigured } from './lib/firebase';
 import {
@@ -49,6 +49,13 @@ export default function App() {
       });
     return () => unsub();
   }, []);
+
+  // 내 프로필 문서를 실시간 구독 — 관리자가 호스트를 승인하는 등 다른 세션의 변경사항이 즉시 반영됨
+  useEffect(() => {
+    if (!currentUser?.id) return;
+    const unsub = subscribeToUserDoc(currentUser.id, setCurrentUser);
+    return unsub;
+  }, [currentUser?.id]);
 
   if (!isFirebaseConfigured) {
     return (
