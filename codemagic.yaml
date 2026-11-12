@@ -67,9 +67,10 @@ workflows:
         script: keychain initialize
       - name: Fetch signing files (자동으로 인증서/프로파일 생성)
         script: |
+          echo "$CERTIFICATE_PRIVATE_KEY_B64" | base64 --decode > /tmp/certificate_private_key.pem
           app-store-connect fetch-signing-files $BUNDLE_ID \
             --type IOS_APP_STORE \
-            --certificate-key="$CERTIFICATE_PRIVATE_KEY" \
+            --certificate-key=@file:/tmp/certificate_private_key.pem \
             --create
       - name: Add certificates to keychain
         script: keychain add-certificates
