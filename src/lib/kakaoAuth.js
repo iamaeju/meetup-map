@@ -8,7 +8,9 @@ import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 import { App as CapApp } from '@capacitor/app';
 
-const KAKAO_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
+// 카카오 로그인(/oauth/authorize, /oauth/token)은 JavaScript 키가 아니라 REST API 키를 써야 함
+// (지도 SDK용 VITE_KAKAO_MAP_KEY와는 별개 — 플랫폼 키 > REST API 키 값)
+const KAKAO_KEY = import.meta.env.VITE_KAKAO_REST_KEY;
 const PENDING_KEY = 'kkachi_kakao_pending';
 const NATIVE_REDIRECT_URI = 'kakaod75f5297db7bc64cab4c80f01f2057c0://oauth';
 
