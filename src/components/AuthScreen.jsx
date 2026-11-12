@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { signUp, logIn, loginWithGoogle } from '../lib/auth';
+import { signUp, logIn, loginWithGoogle, socialLoginKakao } from '../lib/auth';
 import { startKakaoLogin, isKakaoLoginAvailable } from '../lib/kakaoAuth';
 
 export default function AuthScreen({ onAuthed, externalError }) {
@@ -34,10 +34,21 @@ export default function AuthScreen({ onAuthed, externalError }) {
     onAuthed(result.user);
   };
 
-  const handleKakaoLogin = () => {
+  const handleKakaoLogin = async () => {
     setError('');
     setSocialLoading('kakao');
-    startKakaoLogin(); // 카카오 인증 페이지로 이동 (돌아온 뒤 처리는 App.jsx에서)
+    try {
+      // 웹에서는 페이지 이동만 하고 끝(돌아온 뒤 처리는 App.jsx에서),
+      // 네이티브 앱에서는 시스템 브라우저 로그인이 끝난 프로필을 반환함
+      const profile = await startKakaoLogin();
+      if (profile) {
+        const user = await socialLoginKakao(profile);
+        onAuthed(user);
+      }
+    } catch (err) {
+      setError(err.message || '카카오 로그인에 실패했어요.');
+      setSocialLoading(null);
+    }
   };
 
   const handleGoogleLogin = async () => {
