@@ -79,7 +79,7 @@ workflows:
       - name: Increment build number
         script: |
           set -e
-          APP_RESOURCE_ID=$(app-store-connect apps --bundle-id "$BUNDLE_ID" --json | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['id'])")
+          APP_RESOURCE_ID=$(app-store-connect apps list --bundle-id-identifier "$BUNDLE_ID" --strict-match-identifier --json | python3 -c "import json,sys; print(json.load(sys.stdin)[0]['id'])")
           echo "APP_RESOURCE_ID=$APP_RESOURCE_ID"
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-build-number "$APP_RESOURCE_ID" --platform IOS)
           echo "LATEST_BUILD_NUMBER=$LATEST_BUILD_NUMBER"
