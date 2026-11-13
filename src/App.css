@@ -1363,17 +1363,17 @@ button {
 .btn-kakao:hover:not(:disabled) {
   background: #fada0a;
 }
-.btn-kakaopay {
-  background: #fee500;
-  color: #191600;
+.btn-toss {
+  background: #1b64da;
+  color: #fff;
   text-decoration: none;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 8px;
 }
-.btn-kakaopay:hover {
-  background: #fada0a;
+.btn-toss:hover {
+  background: #154fb0;
 }
 .btn-google {
   background: #fff;
@@ -1912,11 +1912,23 @@ button {
   flex-direction: column;
   gap: 8px;
 }
-.dutchpay-form input {
+.dutchpay-form input,
+.dutchpay-form select {
   border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-sm);
   padding: 9px 12px;
   font-size: 13.5px;
+}
+.dutchpay-account-row {
+  display: flex;
+  gap: 8px;
+}
+.dutchpay-account-row select {
+  flex: 0 0 110px;
+}
+.dutchpay-account-row input {
+  flex: 1;
+  min-width: 0;
 }
 
 .dutchpay-status-list {

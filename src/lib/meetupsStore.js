@@ -64,12 +64,14 @@ export function leaveWaitlist(id, name) {
 
 // ---------- 더치페이 ----------
 
-export function setDutchpay(id, { total, note, kakaoPayLink, updatedBy }) {
+export function setDutchpay(id, { total, note, bankName, accountNumber, accountHolder, updatedBy }) {
   return updateDoc(doc(db, COLLECTION, id), {
     dutchpay: {
       total,
       note: note || '',
-      kakaoPayLink: kakaoPayLink || '',
+      bankName: bankName || '',
+      accountNumber: accountNumber || '',
+      accountHolder: accountHolder || '',
       updatedBy,
       updatedAt: Date.now(),
       paidBy: [],

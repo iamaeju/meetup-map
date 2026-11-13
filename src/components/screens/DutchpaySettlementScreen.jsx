@@ -1,4 +1,5 @@
 import { markDutchpayPaid, markDutchpayUnpaid } from '../../lib/meetupsStore';
+import { buildTossSendLink } from '../../lib/tossPay';
 
 export default function DutchpaySettlementScreen({ meetups, currentUser, onOpenMeetupChat, onBack }) {
   const myMeetups = meetups.filter(
@@ -28,6 +29,11 @@ export default function DutchpaySettlementScreen({ meetups, currentUser, onOpenM
           const perPerson = Math.ceil(dutchpay.total / Math.max(1, members.length));
           const paidBy = dutchpay.paidBy || [];
           const iPaid = paidBy.includes(currentUser);
+          const tossLink = buildTossSendLink({
+            bankName: dutchpay.bankName,
+            accountNumber: dutchpay.accountNumber,
+            amount: perPerson,
+          });
 
           return (
             <div key={m.id} className="settlement-card">
@@ -40,14 +46,15 @@ export default function DutchpaySettlementScreen({ meetups, currentUser, onOpenM
                 1인당 <strong>{perPerson.toLocaleString()}원</strong> · {paidBy.length}/{members.length}명 완료
               </p>
               {dutchpay.note && <p className="muted">메모: {dutchpay.note}</p>}
-              {dutchpay.kakaoPayLink && (
-                <a
-                  className="btn btn-block btn-small btn-kakaopay"
-                  href={dutchpay.kakaoPayLink}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  💛 카카오페이로 {perPerson.toLocaleString()}원 송금하기
+              {dutchpay.accountNumber && (
+                <p className="muted">
+                  {dutchpay.bankName} {dutchpay.accountNumber}
+                  {dutchpay.accountHolder && ` (${dutchpay.accountHolder})`}
+                </p>
+              )}
+              {tossLink && (
+                <a className="btn btn-block btn-small btn-toss" href={tossLink}>
+                  🔵 토스로 {perPerson.toLocaleString()}원 바로 송금
                 </a>
               )}
               <button

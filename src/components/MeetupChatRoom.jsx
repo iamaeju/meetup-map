@@ -11,6 +11,7 @@ import {
   clearPoll,
 } from '../lib/meetupsStore';
 import { formatRecurrence, getNextOccurrence } from '../lib/recurrence';
+import { BANK_OPTIONS, buildTossSendLink } from '../lib/tossPay';
 
 function formatTime(ts) {
   const d = new Date(ts);
@@ -73,7 +74,9 @@ function LocationPanel({ meetup, currentUser }) {
 function DutchpayPanel({ meetup, currentUser }) {
   const [total, setTotal] = useState('');
   const [note, setNote] = useState('');
-  const [kakaoPayLink, setKakaoPayLink] = useState('');
+  const [bankName, setBankName] = useState(BANK_OPTIONS[0]);
+  const [accountNumber, setAccountNumber] = useState('');
+  const [accountHolder, setAccountHolder] = useState('');
   const dutchpay = meetup.dutchpay;
   const memberCount = Math.max(1, meetup.participants.length);
 
@@ -81,10 +84,18 @@ function DutchpayPanel({ meetup, currentUser }) {
     e.preventDefault();
     const amount = Number(total);
     if (!amount || amount <= 0) return;
-    setDutchpay(meetup.id, { total: amount, note, kakaoPayLink: kakaoPayLink.trim(), updatedBy: currentUser });
+    setDutchpay(meetup.id, {
+      total: amount,
+      note,
+      bankName,
+      accountNumber: accountNumber.trim(),
+      accountHolder: accountHolder.trim(),
+      updatedBy: currentUser,
+    });
     setTotal('');
     setNote('');
-    setKakaoPayLink('');
+    setAccountNumber('');
+    setAccountHolder('');
   };
 
   if (dutchpay) {
@@ -92,6 +103,11 @@ function DutchpayPanel({ meetup, currentUser }) {
     const paidBy = dutchpay.paidBy || [];
     const iPaid = paidBy.includes(currentUser);
     const members = meetup.participants.length ? meetup.participants : [meetup.hostName];
+    const tossLink = buildTossSendLink({
+      bankName: dutchpay.bankName,
+      accountNumber: dutchpay.accountNumber,
+      amount: perPerson,
+    });
 
     return (
       <div className="chat-tool-panel">
@@ -101,16 +117,17 @@ function DutchpayPanel({ meetup, currentUser }) {
           참여자 {memberCount}명 ÷ 1인당 <strong>{perPerson.toLocaleString()}원</strong>
         </p>
         {dutchpay.note && <p className="muted">메모: {dutchpay.note}</p>}
+        {dutchpay.accountNumber && (
+          <p className="muted">
+            {dutchpay.bankName} {dutchpay.accountNumber}
+            {dutchpay.accountHolder && ` (${dutchpay.accountHolder})`}
+          </p>
+        )}
         <p className="muted">{dutchpay.updatedBy}님이 등록</p>
 
-        {dutchpay.kakaoPayLink && (
-          <a
-            className="btn btn-block btn-small btn-kakaopay"
-            href={dutchpay.kakaoPayLink}
-            target="_blank"
-            rel="noreferrer"
-          >
-            💛 카카오페이로 {perPerson.toLocaleString()}원 송금하기
+        {tossLink && (
+          <a className="btn btn-block btn-small btn-toss" href={tossLink}>
+            🔵 토스로 {perPerson.toLocaleString()}원 바로 송금
           </a>
         )}
 
@@ -154,11 +171,30 @@ function DutchpayPanel({ meetup, currentUser }) {
           onChange={(e) => setTotal(e.target.value)}
         />
         <input placeholder="메모 (선택)" value={note} onChange={(e) => setNote(e.target.value)} />
+
+        <p className="muted" style={{ margin: '4px 0 0' }}>
+          송금 받을 계좌 (선택 — 입력하면 참여자가 토스로 바로 송금할 수 있어요)
+        </p>
+        <div className="dutchpay-account-row">
+          <select value={bankName} onChange={(e) => setBankName(e.target.value)}>
+            {BANK_OPTIONS.map((b) => (
+              <option key={b} value={b}>
+                {b}
+              </option>
+            ))}
+          </select>
+          <input
+            placeholder="계좌번호"
+            value={accountNumber}
+            onChange={(e) => setAccountNumber(e.target.value.replace(/[^0-9]/g, ''))}
+          />
+        </div>
         <input
-          placeholder="카카오페이 송금 링크 (선택 — 카카오페이 앱에서 발급)"
-          value={kakaoPayLink}
-          onChange={(e) => setKakaoPayLink(e.target.value)}
+          placeholder="예금주 (선택)"
+          value={accountHolder}
+          onChange={(e) => setAccountHolder(e.target.value)}
         />
+
         <button type="submit" className="btn btn-primary btn-small">
           정산 등록
         </button>
