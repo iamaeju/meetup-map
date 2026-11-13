@@ -16,7 +16,7 @@ export default defineConfig({
         name: '까치 로컬 커뮤니티',
         short_name: '까치',
         description: '동네 스몰비즈니스 & 이웃 모임을 지도에서 찾고, 직접 열어보세요',
-        theme_color: '#bccc01',
+        theme_color: '#dae034',
         background_color: '#0a0a0a',
         display: 'standalone',
         orientation: 'portrait',

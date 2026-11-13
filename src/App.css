@@ -3,11 +3,11 @@
 }
 
 :root {
-  --accent: #bccc01;
-  --accent-dark: #7a8501;
-  --accent-text: #06240b;
-  --accent-soft: #f5f7d9;
-  --accent-ring: rgba(188, 204, 1, 0.35);
+  --accent: #dae034;
+  --accent-dark: #8e9222;
+  --accent-text: #1a1c05;
+  --accent-soft: #f7f8e0;
+  --accent-ring: rgba(218, 224, 52, 0.35);
 
   --bg: #fafafa;
   --frame-bg: #f0f0f0;
