@@ -73,6 +73,7 @@ function LocationPanel({ meetup, currentUser }) {
 function DutchpayPanel({ meetup, currentUser }) {
   const [total, setTotal] = useState('');
   const [note, setNote] = useState('');
+  const [kakaoPayLink, setKakaoPayLink] = useState('');
   const dutchpay = meetup.dutchpay;
   const memberCount = Math.max(1, meetup.participants.length);
 
@@ -80,9 +81,10 @@ function DutchpayPanel({ meetup, currentUser }) {
     e.preventDefault();
     const amount = Number(total);
     if (!amount || amount <= 0) return;
-    setDutchpay(meetup.id, { total: amount, note, updatedBy: currentUser });
+    setDutchpay(meetup.id, { total: amount, note, kakaoPayLink: kakaoPayLink.trim(), updatedBy: currentUser });
     setTotal('');
     setNote('');
+    setKakaoPayLink('');
   };
 
   if (dutchpay) {
@@ -101,13 +103,24 @@ function DutchpayPanel({ meetup, currentUser }) {
         {dutchpay.note && <p className="muted">메모: {dutchpay.note}</p>}
         <p className="muted">{dutchpay.updatedBy}님이 등록</p>
 
+        {dutchpay.kakaoPayLink && (
+          <a
+            className="btn btn-block btn-small btn-kakaopay"
+            href={dutchpay.kakaoPayLink}
+            target="_blank"
+            rel="noreferrer"
+          >
+            💛 카카오페이로 {perPerson.toLocaleString()}원 송금하기
+          </a>
+        )}
+
         <button
           className={`btn btn-small btn-block ${iPaid ? 'btn-secondary' : 'btn-primary'}`}
           onClick={() =>
             iPaid ? markDutchpayUnpaid(meetup.id, currentUser) : markDutchpayPaid(meetup.id, currentUser)
           }
         >
-          {iPaid ? '✓ 정산 완료함 (취소하기)' : `${perPerson.toLocaleString()}원 정산 완료로 표시`}
+          {iPaid ? '✓ 정산 완료함 (취소하기)' : '정산 완료로 표시'}
         </button>
 
         <ul className="dutchpay-status-list">
@@ -141,6 +154,11 @@ function DutchpayPanel({ meetup, currentUser }) {
           onChange={(e) => setTotal(e.target.value)}
         />
         <input placeholder="메모 (선택)" value={note} onChange={(e) => setNote(e.target.value)} />
+        <input
+          placeholder="카카오페이 송금 링크 (선택 — 카카오페이 앱에서 발급)"
+          value={kakaoPayLink}
+          onChange={(e) => setKakaoPayLink(e.target.value)}
+        />
         <button type="submit" className="btn btn-primary btn-small">
           정산 등록
         </button>

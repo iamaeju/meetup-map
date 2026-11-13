@@ -40,6 +40,16 @@ export default function DutchpaySettlementScreen({ meetups, currentUser, onOpenM
                 1인당 <strong>{perPerson.toLocaleString()}원</strong> · {paidBy.length}/{members.length}명 완료
               </p>
               {dutchpay.note && <p className="muted">메모: {dutchpay.note}</p>}
+              {dutchpay.kakaoPayLink && (
+                <a
+                  className="btn btn-block btn-small btn-kakaopay"
+                  href={dutchpay.kakaoPayLink}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  💛 카카오페이로 {perPerson.toLocaleString()}원 송금하기
+                </a>
+              )}
               <button
                 className={`btn btn-small btn-block ${iPaid ? 'btn-secondary' : 'btn-primary'}`}
                 onClick={() =>

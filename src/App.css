@@ -1363,6 +1363,18 @@ button {
 .btn-kakao:hover:not(:disabled) {
   background: #fada0a;
 }
+.btn-kakaopay {
+  background: #fee500;
+  color: #191600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+}
+.btn-kakaopay:hover {
+  background: #fada0a;
+}
 .btn-google {
   background: #fff;
   color: #1f1f1f;
