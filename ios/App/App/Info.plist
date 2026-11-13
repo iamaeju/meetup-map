@@ -26,6 +26,8 @@
 	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>내 주변 모임을 지도에서 쉽게 찾을 수 있도록 현재 위치를 사용해요.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

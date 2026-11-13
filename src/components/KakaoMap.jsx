@@ -2,11 +2,12 @@ import { useEffect, useRef } from 'react';
 
 const DEFAULT_CENTER = { lat: 37.5563, lng: 126.9254 };
 
-export default function KakaoMap({ meetups, selectedId, onSelect, pickMode, pickedLocation, onPick }) {
+export default function KakaoMap({ meetups, selectedId, onSelect, pickMode, pickedLocation, onPick, myLocation }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
   const pickMarkerRef = useRef(null);
+  const myLocationMarkerRef = useRef(null);
 
   useEffect(() => {
     const { kakao } = window;
@@ -85,6 +86,25 @@ export default function KakaoMap({ meetups, selectedId, onSelect, pickMode, pick
       pickMarkerRef.current = overlay;
     }
   }, [pickedLocation]);
+
+  useEffect(() => {
+    const { kakao } = window;
+    const map = mapRef.current;
+    if (!map || !myLocation) return;
+
+    if (myLocationMarkerRef.current) {
+      myLocationMarkerRef.current.setMap(null);
+    }
+    const position = new kakao.maps.LatLng(myLocation.lat, myLocation.lng);
+    const content = document.createElement('div');
+    content.className = 'kakao-my-location-dot';
+    const overlay = new kakao.maps.CustomOverlay({ position, content, yAnchor: 0.5 });
+    overlay.setMap(map);
+    myLocationMarkerRef.current = overlay;
+
+    map.panTo(position);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myLocation?.ts]);
 
   return (
     <div

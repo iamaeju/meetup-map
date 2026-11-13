@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import KakaoMap from '../KakaoMap';
 import FallbackMap from '../FallbackMap';
 import BrandLogo from '../BrandLogo';
@@ -14,15 +15,45 @@ export default function HomeScreen({
   onConfirmPick,
 }) {
   const MapComponent = kakaoStatus === 'ready' ? KakaoMap : FallbackMap;
+  const [myLocation, setMyLocation] = useState(null);
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState('');
+
+  const handleLocateMe = () => {
+    if (!navigator.geolocation) {
+      setLocationError('이 기기에서는 위치 확인을 지원하지 않아요.');
+      return;
+    }
+    setLocating(true);
+    setLocationError('');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setMyLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude, ts: Date.now() });
+        setLocating(false);
+      },
+      () => {
+        setLocationError('위치 권한을 확인해주세요.');
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
   return (
     <div className="screen home-screen">
       <div className="home-top-bar">
         <BrandLogo iconOnly />
-        <button className="btn btn-primary btn-fab" onClick={onOpenCreate}>
-          + 모임 만들기
-        </button>
+        <div className="home-top-bar-actions">
+          <button className="btn btn-secondary btn-fab-round" onClick={handleLocateMe} disabled={locating}>
+            {locating ? '…' : '🧭'}
+          </button>
+          <button className="btn btn-primary btn-fab" onClick={onOpenCreate}>
+            + 모임 만들기
+          </button>
+        </div>
       </div>
+
+      {locationError && <div className="map-notice map-notice-error">{locationError}</div>}
 
       {kakaoStatus === 'no-key' && (
         <div className="map-notice">
@@ -42,6 +73,7 @@ export default function HomeScreen({
           pickMode={pickMode}
           pickedLocation={pickedLocation}
           onPick={onPick}
+          myLocation={myLocation}
         />
         {pickMode && (
           <div className="pick-banner">
