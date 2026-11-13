@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import NotificationSettingsScreen from './NotificationSettingsScreen';
 import HostRegisterScreen from './HostRegisterScreen';
 import AdminHostApprovalScreen from './AdminHostApprovalScreen';
+import DutchpaySettlementScreen from './DutchpaySettlementScreen';
 import { isAdmin } from '../../lib/auth';
 
 function daysSince(iso) {
@@ -25,9 +26,10 @@ export default function ProfileScreen({
   onProfileImageChange,
   onPatchUser,
   onLogout,
+  onOpenMeetupChat,
 }) {
   const fileInputRef = useRef(null);
-  const [panel, setPanel] = useState('main'); // 'main' | 'notifications' | 'host' | 'admin'
+  const [panel, setPanel] = useState('main'); // 'main' | 'notifications' | 'host' | 'admin' | 'settlement'
   const CURRENT_USER = currentUser.name;
   const joined = meetups.filter((m) => m.participants.includes(CURRENT_USER));
   const waiting = meetups.filter((m) => m.waitlist.includes(CURRENT_USER));
@@ -69,6 +71,17 @@ export default function ProfileScreen({
 
   if (panel === 'admin') {
     return <AdminHostApprovalScreen onBack={() => setPanel('main')} />;
+  }
+
+  if (panel === 'settlement') {
+    return (
+      <DutchpaySettlementScreen
+        meetups={meetups}
+        currentUser={CURRENT_USER}
+        onOpenMeetupChat={onOpenMeetupChat}
+        onBack={() => setPanel('main')}
+      />
+    );
   }
 
   return (
@@ -167,10 +180,10 @@ export default function ProfileScreen({
             <span>🏪 {HOST_MENU_LABEL[hostStatus]}</span>
             <span className="muted">›</span>
           </button>
-          <div className="settings-row">
-            <span>💳 참가비 정산 안내</span>
+          <button className="settings-row" onClick={() => setPanel('settlement')}>
+            <span>💳 참가비 정산</span>
             <span className="muted">›</span>
-          </div>
+          </button>
           {isAdmin(currentUser) && (
             <button className="settings-row" onClick={() => setPanel('admin')}>
               <span>🛠 호스트 승인 관리</span>

@@ -66,12 +66,20 @@ export function leaveWaitlist(id, name) {
 
 export function setDutchpay(id, { total, note, updatedBy }) {
   return updateDoc(doc(db, COLLECTION, id), {
-    dutchpay: { total, note: note || '', updatedBy, updatedAt: Date.now() },
+    dutchpay: { total, note: note || '', updatedBy, updatedAt: Date.now(), paidBy: [] },
   });
 }
 
 export function clearDutchpay(id) {
   return updateDoc(doc(db, COLLECTION, id), { dutchpay: null });
+}
+
+export function markDutchpayPaid(id, name) {
+  return updateDoc(doc(db, COLLECTION, id), { 'dutchpay.paidBy': arrayUnion(name) });
+}
+
+export function markDutchpayUnpaid(id, name) {
+  return updateDoc(doc(db, COLLECTION, id), { 'dutchpay.paidBy': arrayRemove(name) });
 }
 
 // ---------- 투표 ----------

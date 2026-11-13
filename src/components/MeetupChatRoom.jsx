@@ -1,6 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { subscribeMeetupMessages, sendMeetupMessage } from '../lib/meetupChat';
-import { setDutchpay, clearDutchpay, createPoll, votePoll, closePoll, clearPoll } from '../lib/meetupsStore';
+import {
+  setDutchpay,
+  clearDutchpay,
+  markDutchpayPaid,
+  markDutchpayUnpaid,
+  createPoll,
+  votePoll,
+  closePoll,
+  clearPoll,
+} from '../lib/meetupsStore';
 import { formatRecurrence, getNextOccurrence } from '../lib/recurrence';
 
 function formatTime(ts) {
@@ -78,6 +87,10 @@ function DutchpayPanel({ meetup, currentUser }) {
 
   if (dutchpay) {
     const perPerson = Math.ceil(dutchpay.total / memberCount);
+    const paidBy = dutchpay.paidBy || [];
+    const iPaid = paidBy.includes(currentUser);
+    const members = meetup.participants.length ? meetup.participants : [meetup.hostName];
+
     return (
       <div className="chat-tool-panel">
         <h4>💰 더치페이</h4>
@@ -87,6 +100,28 @@ function DutchpayPanel({ meetup, currentUser }) {
         </p>
         {dutchpay.note && <p className="muted">메모: {dutchpay.note}</p>}
         <p className="muted">{dutchpay.updatedBy}님이 등록</p>
+
+        <button
+          className={`btn btn-small btn-block ${iPaid ? 'btn-secondary' : 'btn-primary'}`}
+          onClick={() =>
+            iPaid ? markDutchpayUnpaid(meetup.id, currentUser) : markDutchpayPaid(meetup.id, currentUser)
+          }
+        >
+          {iPaid ? '✓ 정산 완료함 (취소하기)' : `${perPerson.toLocaleString()}원 정산 완료로 표시`}
+        </button>
+
+        <ul className="dutchpay-status-list">
+          {members.map((name) => (
+            <li key={name} className={paidBy.includes(name) ? 'paid' : ''}>
+              <span>{name}</span>
+              <span>{paidBy.includes(name) ? '✓ 완료' : '대기중'}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="muted">
+          {paidBy.length} / {members.length}명 정산 완료
+        </p>
+
         <button className="btn btn-secondary btn-small" onClick={() => clearDutchpay(meetup.id)}>
           정산 삭제
         </button>

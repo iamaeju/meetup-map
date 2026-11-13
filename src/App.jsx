@@ -270,6 +270,7 @@ function AuthedApp({ currentUser, onUserChange }) {
               onProfileImageChange={handleProfileImageChange}
               onPatchUser={handlePatchUser}
               onLogout={handleLogout}
+              onOpenMeetupChat={handleOpenMeetupChat}
             />
           )}
         </div>
