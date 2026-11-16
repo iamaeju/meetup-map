@@ -72,9 +72,10 @@ button {
   opacity: 0;
   pointer-events: none;
 }
-.splash-video-overlay video {
-  width: 100%;
-  height: 100%;
+.splash-logo {
+  width: 140px;
+  height: 140px;
+  border-radius: 28px;
   object-fit: contain;
 }
 
