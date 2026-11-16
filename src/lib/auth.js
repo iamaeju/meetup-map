@@ -47,6 +47,7 @@ function withDefaults(user) {
     notificationSettings: { ...DEFAULT_NOTIFICATION_SETTINGS, ...(user.notificationSettings || {}) },
     host: { ...DEFAULT_HOST, ...(user.host || {}) },
     following: user.following || [],
+    favorites: user.favorites || [],
   };
 }
 
@@ -202,5 +203,14 @@ export async function toggleFollow(currentUserId, targetName) {
       ? u.following.filter((f) => f !== targetName)
       : [...u.following, targetName];
     return { ...u, following };
+  });
+}
+
+export async function toggleFavorite(currentUserId, meetupId) {
+  return updateUser(currentUserId, (u) => {
+    const favorites = u.favorites.includes(meetupId)
+      ? u.favorites.filter((f) => f !== meetupId)
+      : [...u.favorites, meetupId];
+    return { ...u, favorites };
   });
 }

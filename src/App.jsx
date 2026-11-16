@@ -2,7 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { buildChatThreads } from './data/meetups';
 import { matchesCapacity } from './components/screens/ListScreen';
 import { useKakaoLoader } from './hooks/useKakaoLoader';
-import { watchSession, subscribeToUserDoc, logOut, socialLoginKakao, toggleFollow, updateUser } from './lib/auth';
+import {
+  watchSession,
+  subscribeToUserDoc,
+  logOut,
+  socialLoginKakao,
+  toggleFollow,
+  toggleFavorite,
+  updateUser,
+} from './lib/auth';
 import { consumeKakaoRedirect } from './lib/kakaoAuth';
 import { isFirebaseConfigured } from './lib/firebase';
 import {
@@ -23,6 +31,7 @@ import ChatScreen from './components/screens/ChatScreen';
 import ProfileScreen from './components/screens/ProfileScreen';
 import MeetupDetail from './components/MeetupDetail';
 import MeetupChatRoom from './components/MeetupChatRoom';
+import HostProfileScreen from './components/screens/HostProfileScreen';
 import CreateMeetupModal from './components/CreateMeetupModal';
 import './App.css';
 
@@ -100,6 +109,7 @@ function AuthedApp({ currentUser, onUserChange }) {
   const [pickedLocation, setPickedLocation] = useState(null);
   const [dmTarget, setDmTarget] = useState(null);
   const [openMeetupChatId, setOpenMeetupChatId] = useState(null);
+  const [openHostProfile, setOpenHostProfile] = useState(null);
 
   useEffect(() => subscribeToMeetups(setMeetups), []);
 
@@ -184,6 +194,16 @@ function AuthedApp({ currentUser, onUserChange }) {
     if (targetName === CURRENT_USER) return;
     const updated = await toggleFollow(currentUser.id, targetName);
     onUserChange(updated);
+  };
+
+  const handleToggleFavorite = async (meetupId) => {
+    const updated = await toggleFavorite(currentUser.id, meetupId);
+    onUserChange(updated);
+  };
+
+  const handleOpenHostProfile = (hostName) => {
+    setSelectedId(null);
+    setOpenHostProfile(hostName);
   };
 
   const handleStartDM = (targetName) => {
@@ -292,8 +312,11 @@ function AuthedApp({ currentUser, onUserChange }) {
                 currentUser={CURRENT_USER}
                 following={currentUser.following}
                 onToggleFollow={handleToggleFollow}
+                favorites={currentUser.favorites}
+                onToggleFavorite={handleToggleFavorite}
                 onStartDM={handleStartDM}
                 onOpenChat={handleOpenMeetupChat}
+                onOpenHostProfile={handleOpenHostProfile}
                 onClose={() => setSelectedId(null)}
                 onJoin={handleJoin}
                 onLeave={handleLeave}
@@ -311,6 +334,23 @@ function AuthedApp({ currentUser, onUserChange }) {
               currentUser={CURRENT_USER}
               onClose={() => setOpenMeetupChatId(null)}
             />
+          </div>
+        )}
+
+        {openHostProfile && (
+          <div className="sheet-overlay" onClick={() => setOpenHostProfile(null)}>
+            <div className="sheet-panel" onClick={(e) => e.stopPropagation()}>
+              <HostProfileScreen
+                hostName={openHostProfile}
+                meetups={allMeetups}
+                currentUser={CURRENT_USER}
+                onBack={() => setOpenHostProfile(null)}
+                onOpenMeetup={(id) => {
+                  setOpenHostProfile(null);
+                  openMeetup(id);
+                }}
+              />
+            </div>
           </div>
         )}
 

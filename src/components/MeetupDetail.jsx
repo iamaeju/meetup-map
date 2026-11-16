@@ -13,8 +13,11 @@ export default function MeetupDetail({
   currentUser,
   following = [],
   onToggleFollow,
+  favorites = [],
+  onToggleFavorite,
   onStartDM,
   onOpenChat,
+  onOpenHostProfile,
   onClose,
   onJoin,
   onLeave,
@@ -29,6 +32,7 @@ export default function MeetupDetail({
   const isWaiting = meetup.waitlist.includes(currentUser);
   const isFollowing = following.includes(meetup.hostName);
   const isOwnHost = meetup.hostName === currentUser;
+  const isFavorite = favorites.includes(meetup.id);
   const recurrenceLabel = formatRecurrence(meetup.recurrence);
   const nextDate = getNextOccurrence(meetup);
 
@@ -37,6 +41,13 @@ export default function MeetupDetail({
       <button className="detail-close" onClick={onClose}>
         ✕
       </button>
+      <button
+        className={`detail-favorite-btn ${isFavorite ? 'active' : ''}`}
+        onClick={() => onToggleFavorite?.(meetup.id)}
+        title={isFavorite ? '찜 해제' : '찜하기'}
+      >
+        {isFavorite ? '❤️' : '🤍'}
+      </button>
       <div className="meetup-card-top">
         <span className="badge badge-cat">{cat?.label ?? meetup.category}</span>
         {meetup.isBusiness && <span className="badge badge-biz">스몰비즈니스</span>}
@@ -44,9 +55,9 @@ export default function MeetupDetail({
       </div>
       <h2>{meetup.title}</h2>
       <div className="detail-host-row">
-        <p className="detail-host">
-          호스트 · <strong>{meetup.hostName}</strong>
-        </p>
+        <button className="detail-host detail-host-link" onClick={() => onOpenHostProfile?.(meetup.hostName)}>
+          호스트 · <strong>{meetup.hostName}</strong> ›
+        </button>
         {!isOwnHost && (
           <div className="detail-host-actions">
             <button

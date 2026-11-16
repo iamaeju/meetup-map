@@ -34,6 +34,8 @@ export default function ProfileScreen({
   const joined = meetups.filter((m) => m.participants.includes(CURRENT_USER));
   const waiting = meetups.filter((m) => m.waitlist.includes(CURRENT_USER));
   const hosted = meetups.filter((m) => m.hostName === CURRENT_USER);
+  const favorites = currentUser.favorites || [];
+  const favorited = meetups.filter((m) => favorites.includes(m.id));
   const following = currentUser.following || [];
   const hostStatus = currentUser.host?.status || 'none';
 
@@ -154,6 +156,20 @@ export default function ProfileScreen({
           ))}
         </div>
       </section>
+
+      {favorited.length > 0 && (
+        <section className="profile-section">
+          <h3>찜한 모임</h3>
+          <div className="profile-grid">
+            {favorited.map((m) => (
+              <button key={m.id} className="profile-grid-item" onClick={() => onOpenMeetup(m.id)}>
+                <span className="profile-grid-emoji">{m.hostAvatar || '📍'}</span>
+                <span className="profile-grid-title">{m.title}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       {waiting.length > 0 && (
         <section className="profile-section">
