@@ -72,20 +72,10 @@ button {
   opacity: 0;
   pointer-events: none;
 }
-.splash-spin-logo {
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
+.splash-video-overlay video {
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-  animation: splash-spin 1.4s linear infinite;
-}
-@keyframes splash-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 /* ---------- app frame (mobile-app shell) ---------- */
