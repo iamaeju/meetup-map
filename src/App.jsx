@@ -33,9 +33,11 @@ import MeetupDetail from './components/MeetupDetail';
 import MeetupChatRoom from './components/MeetupChatRoom';
 import HostProfileScreen from './components/screens/HostProfileScreen';
 import CreateMeetupModal from './components/CreateMeetupModal';
+import SplashVideo from './components/SplashVideo';
 import './App.css';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const [currentUser, setCurrentUser] = useState(undefined); // undefined = loading, null = logged out
   const [authError, setAuthError] = useState('');
 
@@ -66,28 +68,41 @@ export default function App() {
     return unsub;
   }, [currentUser?.id]);
 
+  const splash = showSplash && <SplashVideo onDone={() => setShowSplash(false)} />;
+
   if (!isFirebaseConfigured) {
     return (
-      <div className="app">
-        <div className="app-frame">
-          <FirebaseSetupNotice />
+      <>
+        {splash}
+        <div className="app">
+          <div className="app-frame">
+            <FirebaseSetupNotice />
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
-  if (currentUser === undefined) return null;
+  if (currentUser === undefined) return splash || null;
   if (!currentUser) {
     return (
-      <div className="app">
-        <div className="app-frame">
-          <AuthScreen onAuthed={setCurrentUser} externalError={authError} />
+      <>
+        {splash}
+        <div className="app">
+          <div className="app-frame">
+            <AuthScreen onAuthed={setCurrentUser} externalError={authError} />
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
-  return <AuthedApp currentUser={currentUser} onUserChange={setCurrentUser} />;
+  return (
+    <>
+      {splash}
+      <AuthedApp currentUser={currentUser} onUserChange={setCurrentUser} />
+    </>
+  );
 }
 
 function AuthedApp({ currentUser, onUserChange }) {
