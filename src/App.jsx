@@ -68,7 +68,8 @@ export default function App() {
     return unsub;
   }, [currentUser?.id]);
 
-  const splash = showSplash && <SplashVideo onDone={() => setShowSplash(false)} />;
+  const authResolved = !isFirebaseConfigured || currentUser !== undefined;
+  const splash = showSplash && <SplashVideo ready={authResolved} onDone={() => setShowSplash(false)} />;
 
   if (!isFirebaseConfigured) {
     return (
