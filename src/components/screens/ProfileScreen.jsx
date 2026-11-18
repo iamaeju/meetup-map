@@ -3,6 +3,7 @@ import NotificationSettingsScreen from './NotificationSettingsScreen';
 import HostRegisterScreen from './HostRegisterScreen';
 import AdminHostApprovalScreen from './AdminHostApprovalScreen';
 import DutchpaySettlementScreen from './DutchpaySettlementScreen';
+import DeleteAccountScreen from './DeleteAccountScreen';
 import { isAdmin } from '../../lib/auth';
 
 function daysSince(iso) {
@@ -27,9 +28,10 @@ export default function ProfileScreen({
   onPatchUser,
   onLogout,
   onOpenMeetupChat,
+  onDeleteAccount,
 }) {
   const fileInputRef = useRef(null);
-  const [panel, setPanel] = useState('main'); // 'main' | 'notifications' | 'host' | 'admin' | 'settlement'
+  const [panel, setPanel] = useState('main'); // 'main' | 'notifications' | 'host' | 'admin' | 'settlement' | 'delete'
   const CURRENT_USER = currentUser.name;
   const joined = meetups.filter((m) => m.participants.includes(CURRENT_USER));
   const waiting = meetups.filter((m) => m.waitlist.includes(CURRENT_USER));
@@ -81,6 +83,16 @@ export default function ProfileScreen({
         meetups={meetups}
         currentUser={CURRENT_USER}
         onOpenMeetupChat={onOpenMeetupChat}
+        onBack={() => setPanel('main')}
+      />
+    );
+  }
+
+  if (panel === 'delete') {
+    return (
+      <DeleteAccountScreen
+        currentUser={currentUser}
+        onConfirm={onDeleteAccount}
         onBack={() => setPanel('main')}
       />
     );
@@ -208,6 +220,9 @@ export default function ProfileScreen({
           )}
           <button className="settings-row settings-row-danger" onClick={onLogout}>
             <span>🚪 로그아웃</span>
+          </button>
+          <button className="settings-row settings-row-danger" onClick={() => setPanel('delete')}>
+            <span>😢 회원 탈퇴</span>
           </button>
         </div>
       </section>

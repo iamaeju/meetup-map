@@ -2164,3 +2164,25 @@ button {
     box-shadow: none;
   }
 }
+
+.delete-account-form {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.delete-account-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13.5px;
+  color: var(--text-soft);
+}
+.delete-account-agree {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13.5px;
+}
+.delete-account-agree input {
+  margin-top: 3px;
+}

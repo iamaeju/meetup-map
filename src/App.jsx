@@ -10,6 +10,7 @@ import {
   toggleFollow,
   toggleFavorite,
   updateUser,
+  deleteAccount,
 } from './lib/auth';
 import { consumeKakaoRedirect } from './lib/kakaoAuth';
 import { isFirebaseConfigured } from './lib/firebase';
@@ -233,6 +234,11 @@ function AuthedApp({ currentUser, onUserChange }) {
     logOut();
   };
 
+  const handleDeleteAccount = async (password) => {
+    await deleteAccount(currentUser.id, password);
+    logOut();
+  };
+
   const handleOpenMeetupChat = (id) => {
     setSelectedId(null);
     setOpenMeetupChatId(id);
@@ -307,6 +313,7 @@ function AuthedApp({ currentUser, onUserChange }) {
               onPatchUser={handlePatchUser}
               onLogout={handleLogout}
               onOpenMeetupChat={handleOpenMeetupChat}
+              onDeleteAccount={handleDeleteAccount}
             />
           )}
         </div>

@@ -6,8 +6,11 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile,
+  deleteUser,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { auth, db, isFirebaseConfigured } from './firebase';
 
 const KAKAO_UID_KEY = 'kkachi_kakao_uid';
@@ -213,4 +216,23 @@ export async function toggleFavorite(currentUserId, meetupId) {
       : [...u.favorites, meetupId];
     return { ...u, favorites };
   });
+}
+
+// 회원 탈퇴 — 이메일 계정은 비밀번호 재인증 후 Firebase Auth 계정까지 삭제,
+// 카카오 계정은 Firebase Auth를 거치지 않으므로 Firestore 문서 삭제 + 로컬 포인터 제거로 처리
+export async function deleteAccount(userId, password) {
+  await deleteDoc(doc(db, 'users', userId));
+
+  if (userId.startsWith('kakao_')) {
+    localStorage.removeItem(KAKAO_UID_KEY);
+    return;
+  }
+
+  const fbUser = auth.currentUser;
+  if (!fbUser) return;
+  if (password) {
+    const credential = EmailAuthProvider.credential(fbUser.email, password);
+    await reauthenticateWithCredential(fbUser, credential);
+  }
+  await deleteUser(fbUser);
 }
