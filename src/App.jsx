@@ -9,6 +9,7 @@ import {
   socialLoginKakao,
   toggleFollow,
   toggleFavorite,
+  toggleBlock,
   updateUser,
   deleteAccount,
 } from './lib/auth';
@@ -239,6 +240,11 @@ function AuthedApp({ currentUser, onUserChange }) {
     logOut();
   };
 
+  const handleToggleBlock = async (targetName) => {
+    const updated = await toggleBlock(currentUser.id, targetName);
+    onUserChange(updated);
+  };
+
   const handleOpenMeetupChat = (id) => {
     setSelectedId(null);
     setOpenMeetupChatId(id);
@@ -300,6 +306,8 @@ function AuthedApp({ currentUser, onUserChange }) {
               currentUser={CURRENT_USER}
               dmTarget={dmTarget}
               onConsumeDmTarget={() => setDmTarget(null)}
+              blockedUsers={currentUser.blockedUsers}
+              onToggleBlock={handleToggleBlock}
             />
           )}
 
@@ -355,6 +363,8 @@ function AuthedApp({ currentUser, onUserChange }) {
             <MeetupChatRoom
               meetup={openMeetupChat}
               currentUser={CURRENT_USER}
+              blockedUsers={currentUser.blockedUsers}
+              onToggleBlock={handleToggleBlock}
               onClose={() => setOpenMeetupChatId(null)}
             />
           </div>

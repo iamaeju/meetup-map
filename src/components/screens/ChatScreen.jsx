@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { subscribeThreads, subscribeMessages, sendMessage } from '../../lib/dm';
+import ReportBlockSheet from '../ReportBlockSheet';
 
 function formatTime(ts) {
   const d = new Date(ts);
   return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
 }
 
-function DMConversation({ currentUser, otherUser, onBack }) {
+function DMConversation({ currentUser, otherUser, isBlocked, onToggleBlock, onBack }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
+  const [showSheet, setShowSheet] = useState(false);
   const listRef = useRef(null);
 
   useEffect(() => subscribeMessages(currentUser, otherUser, setMessages), [currentUser, otherUser]);
@@ -31,7 +33,20 @@ function DMConversation({ currentUser, otherUser, onBack }) {
           ‹
         </button>
         <strong>{otherUser}</strong>
+        <button className="chat-bubble-menu-btn" onClick={() => setShowSheet(true)} aria-label="신고/차단">
+          ⋯
+        </button>
       </div>
+      {showSheet && (
+        <ReportBlockSheet
+          reporterName={currentUser}
+          targetName={otherUser}
+          context={`DM with ${otherUser}`}
+          isBlocked={isBlocked}
+          onToggleBlock={onToggleBlock}
+          onClose={() => setShowSheet(false)}
+        />
+      )}
       <div className="dm-messages" ref={listRef}>
         {messages.length === 0 && <p className="muted dm-empty">{otherUser}님에게 첫 메시지를 보내보세요.</p>}
         {messages.map((m, i) => (
@@ -41,17 +56,29 @@ function DMConversation({ currentUser, otherUser, onBack }) {
           </div>
         ))}
       </div>
-      <form className="dm-input-row" onSubmit={handleSend}>
-        <input value={text} onChange={(e) => setText(e.target.value)} placeholder="메시지 보내기..." />
-        <button type="submit" className="btn btn-primary btn-small">
-          전송
-        </button>
-      </form>
+      {isBlocked ? (
+        <p className="muted dm-blocked-notice">차단한 사용자예요. 메시지를 보낼 수 없어요.</p>
+      ) : (
+        <form className="dm-input-row" onSubmit={handleSend}>
+          <input value={text} onChange={(e) => setText(e.target.value)} placeholder="메시지 보내기..." />
+          <button type="submit" className="btn btn-primary btn-small">
+            전송
+          </button>
+        </form>
+      )}
     </div>
   );
 }
 
-export default function ChatScreen({ threads, onOpenMeetup, currentUser, dmTarget, onConsumeDmTarget }) {
+export default function ChatScreen({
+  threads,
+  onOpenMeetup,
+  currentUser,
+  dmTarget,
+  onConsumeDmTarget,
+  blockedUsers = [],
+  onToggleBlock,
+}) {
   const [dmThreads, setDmThreads] = useState([]);
   const [openDmUser, setOpenDmUser] = useState(null);
 
@@ -67,10 +94,18 @@ export default function ChatScreen({ threads, onOpenMeetup, currentUser, dmTarge
   if (openDmUser) {
     return (
       <div className="screen chat-screen">
-        <DMConversation currentUser={currentUser} otherUser={openDmUser} onBack={() => setOpenDmUser(null)} />
+        <DMConversation
+          currentUser={currentUser}
+          otherUser={openDmUser}
+          isBlocked={blockedUsers.includes(openDmUser)}
+          onToggleBlock={onToggleBlock}
+          onBack={() => setOpenDmUser(null)}
+        />
       </div>
     );
   }
+
+  const visibleDmThreads = dmThreads.filter((t) => !blockedUsers.includes(t.otherUser));
 
   return (
     <div className="screen chat-screen">
@@ -78,11 +113,11 @@ export default function ChatScreen({ threads, onOpenMeetup, currentUser, dmTarge
         <h1>채팅</h1>
       </div>
 
-      {dmThreads.length > 0 && (
+      {visibleDmThreads.length > 0 && (
         <>
           <p className="chat-section-title">다이렉트 메시지</p>
           <div className="chat-list">
-            {dmThreads.map((t) => (
+            {visibleDmThreads.map((t) => (
               <button key={t.id} className="chat-row" onClick={() => setOpenDmUser(t.otherUser)}>
                 <span className="chat-avatar">👤</span>
                 <div className="chat-row-text">
@@ -114,7 +149,7 @@ export default function ChatScreen({ threads, onOpenMeetup, currentUser, dmTarge
           </button>
         ))}
 
-        {threads.length === 0 && dmThreads.length === 0 && (
+        {threads.length === 0 && visibleDmThreads.length === 0 && (
           <div className="empty-state">
             <p className="empty-emoji">💬</p>
             <p>참여한 모임이 없어요.</p>

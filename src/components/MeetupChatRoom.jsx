@@ -12,6 +12,7 @@ import {
 } from '../lib/meetupsStore';
 import { formatRecurrence, getNextOccurrence } from '../lib/recurrence';
 import { BANK_OPTIONS, buildTossSendLink } from '../lib/tossPay';
+import ReportBlockSheet from './ReportBlockSheet';
 
 function formatTime(ts) {
   const d = new Date(ts);
@@ -283,10 +284,11 @@ function PollPanel({ meetup, currentUser }) {
   );
 }
 
-export default function MeetupChatRoom({ meetup, currentUser, onClose }) {
+export default function MeetupChatRoom({ meetup, currentUser, blockedUsers = [], onToggleBlock, onClose }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
   const [tool, setTool] = useState(null); // 'schedule' | 'location' | 'dutchpay' | 'poll' | null
+  const [reportTarget, setReportTarget] = useState(null);
   const listRef = useRef(null);
 
   useEffect(() => subscribeMeetupMessages(meetup.id, setMessages), [meetup.id]);
@@ -337,18 +339,36 @@ export default function MeetupChatRoom({ meetup, currentUser, onClose }) {
       {tool === 'dutchpay' && <DutchpayPanel meetup={meetup} currentUser={currentUser} />}
       {tool === 'poll' && <PollPanel meetup={meetup} currentUser={currentUser} />}
 
+      {reportTarget && (
+        <ReportBlockSheet
+          reporterName={currentUser}
+          targetName={reportTarget}
+          context={`Meetup chat: ${meetup.title}`}
+          isBlocked={blockedUsers.includes(reportTarget)}
+          onToggleBlock={onToggleBlock}
+          onClose={() => setReportTarget(null)}
+        />
+      )}
+
       <div className="dm-messages" ref={listRef}>
         {messages.length === 0 && <p className="muted dm-empty">아직 대화가 없어요. 첫 메시지를 보내보세요.</p>}
-        {messages.map((m, i) => {
-          const mine = m.sender === currentUser;
-          return (
-            <div key={i} className={`dm-bubble-row ${mine ? 'mine' : ''}`}>
-              {!mine && <span className="meetup-chat-sender">{m.sender}</span>}
-              <div className="dm-bubble">{m.text}</div>
-              <span className="dm-bubble-time">{formatTime(m.at)}</span>
-            </div>
-          );
-        })}
+        {messages
+          .filter((m) => m.sender === currentUser || !blockedUsers.includes(m.sender))
+          .map((m, i) => {
+            const mine = m.sender === currentUser;
+            return (
+              <div key={i} className={`dm-bubble-row ${mine ? 'mine' : ''}`}>
+                {!mine && <span className="meetup-chat-sender">{m.sender}</span>}
+                <div className="dm-bubble">{m.text}</div>
+                <span className="dm-bubble-time">{formatTime(m.at)}</span>
+                {!mine && (
+                  <button className="chat-bubble-menu-btn" onClick={() => setReportTarget(m.sender)} aria-label="신고/차단">
+                    ⋯
+                  </button>
+                )}
+              </div>
+            );
+          })}
       </div>
 
       <form className="dm-input-row" onSubmit={handleSend}>

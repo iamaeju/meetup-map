@@ -26,6 +26,11 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    match /reports/{reportId} {
+      allow read, update, delete: if false;
+      allow create: if true;
+    }
+
     match /dmThreads/{threadId} {
       allow read: if true;
       allow write: if true;

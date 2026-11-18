@@ -51,6 +51,7 @@ function withDefaults(user) {
     host: { ...DEFAULT_HOST, ...(user.host || {}) },
     following: user.following || [],
     favorites: user.favorites || [],
+    blockedUsers: user.blockedUsers || [],
   };
 }
 
@@ -206,6 +207,15 @@ export async function toggleFollow(currentUserId, targetName) {
       ? u.following.filter((f) => f !== targetName)
       : [...u.following, targetName];
     return { ...u, following };
+  });
+}
+
+export async function toggleBlock(currentUserId, targetName) {
+  return updateUser(currentUserId, (u) => {
+    const blockedUsers = u.blockedUsers.includes(targetName)
+      ? u.blockedUsers.filter((b) => b !== targetName)
+      : [...u.blockedUsers, targetName];
+    return { ...u, blockedUsers };
   });
 }
 
