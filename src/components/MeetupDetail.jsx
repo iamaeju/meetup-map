@@ -1,3 +1,4 @@
+import { Share } from '@capacitor/share';
 import { CATEGORIES } from '../data/meetups';
 import { formatRecurrence, getNextOccurrence } from '../lib/recurrence';
 
@@ -36,10 +37,22 @@ export default function MeetupDetail({
   const recurrenceLabel = formatRecurrence(meetup.recurrence);
   const nextDate = getNextOccurrence(meetup);
 
+  const handleShare = async () => {
+    const text = `${meetup.title} · ${meetup.hostName}님의 모임 — 까치에서 같이 참여해요!`;
+    try {
+      await Share.share({ title: meetup.title, text, dialogTitle: '모임 공유하기' });
+    } catch {
+      // 사용자가 공유를 취소한 경우는 무시
+    }
+  };
+
   return (
     <div className="detail-panel">
       <button className="detail-close" onClick={onClose}>
         ✕
+      </button>
+      <button className="detail-share-btn" onClick={handleShare} title="공유하기">
+        ↗
       </button>
       <button
         className={`detail-favorite-btn ${isFavorite ? 'active' : ''}`}

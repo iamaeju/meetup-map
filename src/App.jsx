@@ -36,6 +36,7 @@ import MeetupChatRoom from './components/MeetupChatRoom';
 import HostProfileScreen from './components/screens/HostProfileScreen';
 import CreateMeetupModal from './components/CreateMeetupModal';
 import SplashVideo from './components/SplashVideo';
+import { requestNotificationPermission, scheduleMeetupReminder, cancelMeetupReminder } from './lib/localNotifications';
 import './App.css';
 
 export default function App() {
@@ -155,9 +156,13 @@ function AuthedApp({ currentUser, onUserChange }) {
     const m = allMeetups.find((x) => x.id === id);
     if (!m || m.participants.includes(CURRENT_USER) || m.participants.length >= m.capacity) return;
     joinMeetup(id, CURRENT_USER);
+    requestNotificationPermission().then(() => scheduleMeetupReminder(m));
   };
 
-  const handleLeave = (id) => leaveMeetup(id, CURRENT_USER);
+  const handleLeave = (id) => {
+    leaveMeetup(id, CURRENT_USER);
+    cancelMeetupReminder(id);
+  };
 
   const handleWaitlist = (id) => {
     const m = allMeetups.find((x) => x.id === id);
