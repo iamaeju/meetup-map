@@ -218,6 +218,14 @@ export default function ProfileScreen({
               <span className="muted">›</span>
             </button>
           )}
+          <a className="settings-row" href="/terms.html" target="_blank" rel="noreferrer">
+            <span>📄 이용약관</span>
+            <span className="muted">›</span>
+          </a>
+          <a className="settings-row" href="/privacy.html" target="_blank" rel="noreferrer">
+            <span>🔒 개인정보처리방침</span>
+            <span className="muted">›</span>
+          </a>
           <button className="settings-row settings-row-danger" onClick={onLogout}>
             <span>🚪 로그아웃</span>
           </button>
