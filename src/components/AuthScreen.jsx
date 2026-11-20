@@ -8,6 +8,7 @@ export default function AuthScreen({ onAuthed, externalError }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(externalError || '');
   const [submitting, setSubmitting] = useState(false);
+  const [agreedTerms, setAgreedTerms] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,6 +16,10 @@ export default function AuthScreen({ onAuthed, externalError }) {
 
     if (!email.trim() || !password.trim() || (mode === 'signup' && !name.trim())) {
       setError('모든 항목을 입력해주세요.');
+      return;
+    }
+    if (mode === 'signup' && !agreedTerms) {
+      setError('이용약관에 동의해야 회원가입할 수 있어요.');
       return;
     }
 
@@ -65,6 +70,23 @@ export default function AuthScreen({ onAuthed, externalError }) {
             placeholder="••••••••"
           />
         </label>
+
+        {mode === 'signup' && (
+          <label className="auth-terms-agree">
+            <input
+              type="checkbox"
+              checked={agreedTerms}
+              onChange={(e) => setAgreedTerms(e.target.checked)}
+            />
+            <span>
+              (필수){' '}
+              <a href="/terms.html" target="_blank" rel="noreferrer">
+                이용약관
+              </a>
+              에 동의합니다. 부적절한 콘텐츠·괴롭힘 행위는 발견 즉시 삭제·계정 정지될 수 있어요.
+            </span>
+          </label>
+        )}
 
         {error && <p className="form-error">{error}</p>}
 
