@@ -42,7 +42,7 @@ export default function AuthScreen({ onAuthed, externalError }) {
       <div className="auth-brand">
         <img src="/brand-icon-original.jpg" alt="까치" className="auth-brand-icon" />
         <h1>까치 로컬 커뮤니티</h1>
-        <p className="muted">동네 모임과 스몰비즈니스를 지도에서 찾아보세요</p>
+        <p className="muted">취향기반 팝미팅을 통해 나다움을 만들어 가는 날</p>
       </div>
 
       <form className="auth-form" onSubmit={handleSubmit}>

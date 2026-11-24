@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { buildChatThreads } from './data/meetups';
+import { getNextOccurrence } from './lib/recurrence';
 import { matchesCapacity } from './components/screens/ListScreen';
 import { useKakaoLoader } from './hooks/useKakaoLoader';
 import {
@@ -132,14 +133,25 @@ function AuthedApp({ currentUser, onUserChange }) {
 
   useEffect(() => subscribeToMeetups(setMeetups), []);
 
+  useEffect(() => {
+    const sharedId = new URLSearchParams(window.location.search).get('meetup');
+    if (sharedId) {
+      setSelectedId(sharedId);
+      setTab('home');
+    }
+  }, []);
+
   const withStatus = (list) =>
     list.map((m) => ({ ...m, status: m.participants.length >= m.capacity ? 'full' : 'open' }));
 
   const allMeetups = useMemo(() => withStatus(meetups), [meetups]);
 
+  // 종료된(다음 일정이 없는) 모임은 지도/목록에서 자동으로 숨김
+  const activeMeetups = useMemo(() => allMeetups.filter((m) => getNextOccurrence(m) !== null), [allMeetups]);
+
   const filteredForList = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
-    return allMeetups.filter((m) => {
+    return activeMeetups.filter((m) => {
       if (category !== 'all' && m.category !== category) return false;
       if (province !== '전체' && m.city !== province) return false;
       if (district !== '전체' && m.region !== district) return false;
@@ -147,7 +159,7 @@ function AuthedApp({ currentUser, onUserChange }) {
       if (kw && !(m.title.toLowerCase().includes(kw) || m.hostName.toLowerCase().includes(kw))) return false;
       return true;
     });
-  }, [allMeetups, category, province, district, capacityFilter, keyword]);
+  }, [activeMeetups, category, province, district, capacityFilter, keyword]);
 
   const selected = allMeetups.find((m) => m.id === selectedId) || null;
   const chatThreads = useMemo(() => buildChatThreads(allMeetups, CURRENT_USER), [allMeetups, CURRENT_USER]);
@@ -264,7 +276,7 @@ function AuthedApp({ currentUser, onUserChange }) {
           {tab === 'home' && (
             <HomeScreen
               kakaoStatus={kakaoStatus}
-              meetups={allMeetups}
+              meetups={activeMeetups}
               selectedId={selectedId}
               onSelect={openMeetup}
               pickMode={pickMode}

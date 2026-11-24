@@ -36,13 +36,106 @@ function ParticipantStack({ meetup, currentUser, onOpenMeetup }) {
 
 export default function FeedScreen({ meetups, onOpenMeetup, currentUser, following = [], onToggleFollow, onStartDM }) {
   const [liked, setLiked] = useState({});
+  const [view, setView] = useState('grid');
+  const [openPostId, setOpenPostId] = useState(null);
 
   const toggleLike = (id) => setLiked((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  if (view === 'grid') {
+    return (
+      <div className="screen feed-screen">
+        <div className="screen-header feed-header">
+          <h1><BrandLogo /></h1>
+          <div className="feed-view-toggle">
+            <button className="active" onClick={() => setView('list')} title="목록으로 보기">
+              ☰
+            </button>
+          </div>
+        </div>
+
+        <div className="feed-grid">
+          {feedPosts.map((post) => (
+            <button key={post.id} className="feed-grid-item" onClick={() => setOpenPostId(post.id)}>
+              <div className="feed-grid-image" style={{ background: post.image }} />
+              <div className="feed-grid-overlay">
+                <span className="feed-grid-author">{post.avatar} {post.author}</span>
+                <span className="feed-grid-caption">{post.caption}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {openPostId != null && (
+          <div className="feed-grid-modal-overlay" onClick={() => setOpenPostId(null)}>
+            <div className="feed-grid-modal" onClick={(e) => e.stopPropagation()}>
+              <button className="feed-grid-modal-close" onClick={() => setOpenPostId(null)}>✕</button>
+              {(() => {
+                const post = feedPosts.find((p) => p.id === openPostId);
+                if (!post) return null;
+                const meetup = meetups.find((m) => String(m.id) === String(post.meetupId));
+                const isFollowing = following.includes(post.author);
+                const isOwn = post.author === currentUser;
+                return (
+                  <article className="feed-post">
+                    <div className="feed-post-head">
+                      <span className="feed-avatar">{post.avatar}</span>
+                      <div className="feed-post-head-text">
+                        <strong>{post.author}</strong>
+                        <span className="muted">{post.timeAgo}</span>
+                      </div>
+                      {!isOwn && (
+                        <button
+                          className={`feed-follow-btn ${isFollowing ? 'following' : ''}`}
+                          onClick={() => onToggleFollow(post.author)}
+                        >
+                          {isFollowing ? '팔로잉' : '팔로우'}
+                        </button>
+                      )}
+                      {meetup && (
+                        <button className="feed-visit-btn" onClick={() => onOpenMeetup(meetup.id)}>
+                          모임 보기
+                        </button>
+                      )}
+                    </div>
+                    <div className="feed-image" style={{ background: post.image }} />
+                    <div className="feed-post-actions">
+                      <button
+                        className={`feed-like-btn ${liked[post.id] ? 'liked' : ''}`}
+                        onClick={() => toggleLike(post.id)}
+                      >
+                        {liked[post.id] ? '💚' : '🤍'}
+                      </button>
+                      <span className="muted">💬 {post.comments}</span>
+                      {!isOwn && (
+                        <button className="feed-dm-btn" onClick={() => onStartDM(post.author)}>
+                          ✉️ 메시지
+                        </button>
+                      )}
+                    </div>
+                    <p className="feed-likes">좋아요 {post.likes + (liked[post.id] ? 1 : 0)}개</p>
+                    <ParticipantStack meetup={meetup} currentUser={currentUser} onOpenMeetup={onOpenMeetup} />
+                    <p className="feed-caption">
+                      <strong>{post.author}</strong> {post.caption}
+                    </p>
+                  </article>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="screen feed-screen">
       <div className="screen-header feed-header">
         <h1><BrandLogo /></h1>
+        <div className="feed-view-toggle">
+          <button onClick={() => setView('grid')} title="격자로 보기">
+            ▦
+          </button>
+        </div>
       </div>
 
       <div className="feed-list">

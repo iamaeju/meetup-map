@@ -6,6 +6,7 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile,
+  sendEmailVerification,
   deleteUser,
   reauthenticateWithCredential,
   EmailAuthProvider,
@@ -105,6 +106,11 @@ export async function signUp({ name, email, password }) {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(cred.user, { displayName: name });
     const user = await ensureUserDoc(cred.user.uid, { name, email, provider: 'password' });
+    try {
+      await sendEmailVerification(cred.user);
+    } catch {
+      // 인증 메일 발송 실패는 가입 자체를 막지 않음
+    }
     return { user };
   } catch (err) {
     return { error: mapFirebaseError(err.code) };
