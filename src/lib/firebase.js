@@ -18,4 +18,7 @@ export const app = isFirebaseConfigured
   : null;
 
 export const auth = isFirebaseConfigured ? getAuth(app) : null;
+if (auth) {
+  auth.languageCode = 'ko';
+}
 export const db = isFirebaseConfigured ? getFirestore(app) : null;
