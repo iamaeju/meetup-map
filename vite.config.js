@@ -13,7 +13,7 @@ export default defineConfig({
       },
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: '까치 로컬 커뮤니티',
+        name: '까치 팝미팅',
         short_name: '까치',
         description: '동네 스몰비즈니스 & 이웃 모임을 지도에서 찾고, 직접 열어보세요',
         theme_color: '#dae034',

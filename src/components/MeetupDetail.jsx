@@ -38,10 +38,10 @@ export default function MeetupDetail({
   const nextDate = getNextOccurrence(meetup);
 
   const handleShare = async () => {
-    const url = `https://meetup-map-pearl.vercel.app/?meetup=${encodeURIComponent(meetup.id)}`;
-    const text = `${meetup.title} · ${meetup.hostName}님의 모임 — 까치에서 같이 참여해요!`;
+    const url = `https://meetup-map-pearl.vercel.app/?meetup=${encodeURIComponent(String(meetup.id))}`;
+    const text = `${meetup.title} · ${meetup.hostName}님의 모임 — 까치에서 같이 참여해요!\n${url}`;
     try {
-      await Share.share({ title: meetup.title, text, url, dialogTitle: '모임 공유하기' });
+      await Share.share({ title: meetup.title, text, dialogTitle: '모임 공유하기' });
     } catch {
       // 사용자가 공유를 취소한 경우는 무시
     }
