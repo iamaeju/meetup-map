@@ -1821,6 +1821,7 @@ button {
 .chat-room-overlay {
   position: absolute;
   inset: 0;
+  top: env(safe-area-inset-top);
   background: var(--card-bg);
   z-index: 60;
   display: flex;
