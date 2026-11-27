@@ -22,8 +22,22 @@ export default function KakaoMap({ meetups, selectedId, onSelect, pickMode, pick
       onPickRef.current?.({ lat: e.latLng.getLat(), lng: e.latLng.getLng() });
     });
 
+    // 컨테이너 크기가 레이아웃 확정 전/후로 바뀌면 지도가 실제 화면 크기와 어긋나 보이는 문제 방지
+    const relayout = () => {
+      const center = map.getCenter();
+      map.relayout();
+      map.setCenter(center);
+    };
+    const resizeObserver = new ResizeObserver(relayout);
+    resizeObserver.observe(containerRef.current);
+    window.addEventListener('orientationchange', relayout);
+    const settleTimer = setTimeout(relayout, 300);
+
     return () => {
       kakao.maps.event.removeListener(map, 'click', clickListener);
+      resizeObserver.disconnect();
+      window.removeEventListener('orientationchange', relayout);
+      clearTimeout(settleTimer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -47,12 +61,21 @@ export default function KakaoMap({ meetups, selectedId, onSelect, pickMode, pick
     meetups.forEach((m) => {
       const position = new kakao.maps.LatLng(m.lat, m.lng);
       const content = document.createElement('div');
-      content.className = `kakao-pin ${m.status === 'full' ? 'pin-full' : ''} ${
+      content.className = `kakao-pin-photo ${m.status === 'full' ? 'pin-full' : ''} ${
         selectedId === m.id ? 'pin-selected' : ''
       }`;
-      content.textContent = '📍';
       content.title = m.title;
       content.onclick = () => onSelect(m.id);
+
+      const bubble = document.createElement('div');
+      bubble.className = 'kakao-pin-photo-bubble';
+      bubble.style.background = m.photos?.[0] || 'var(--primary)';
+      bubble.textContent = m.hostAvatar || '📍';
+      content.appendChild(bubble);
+
+      const tail = document.createElement('div');
+      tail.className = 'kakao-pin-photo-tail';
+      content.appendChild(tail);
 
       const overlay = new kakao.maps.CustomOverlay({
         position,

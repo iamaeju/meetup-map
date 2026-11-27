@@ -31,7 +31,10 @@ const weeksBetween = (a, b) => Math.round((startOfDay(b) - startOfDay(a)) / (7 *
 // 정기모임의 다음 발생일을 계산 (오늘 이후로 가장 가까운 회차, 종료 조건 넘으면 null)
 export function getNextOccurrence(meetup) {
   const start = new Date(meetup.startAt);
-  if (!meetup.recurrence?.enabled) return start;
+  if (!meetup.recurrence?.enabled) {
+    const end = new Date(start.getTime() + (meetup.durationMin || 0) * 60 * 1000);
+    return end < new Date() ? null : start;
+  }
 
   const { frequency, weekdays = [], endType, endCount = 1, endDate } = meetup.recurrence;
   const now = new Date();
